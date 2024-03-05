@@ -1,0 +1,46 @@
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
+
+@Service
+public class JsonPlaceHolderService {
+
+    private static final String BASE_URL = "https://jsonplaceholder.typicode.com";
+
+    private final RestTemplate restTemplate;
+
+    @Autowired
+    public JsonPlaceHolderService(RestTemplate restTemplate) {
+        this.restTemplate = restTemplate;
+    }
+
+    public ResponseEntity<String> findById(Long id) {
+        String url = BASE_URL + "/posts/" + id;
+        return restTemplate.getForEntity(url, String.class);
+    }
+
+    public ResponseEntity<String> createPost(String postJson) {
+        String url = BASE_URL + "/posts";
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Content-Type", "application/json");
+        HttpEntity<String> requestEntity = new HttpEntity<>(postJson, headers);
+        return restTemplate.exchange(url, HttpMethod.POST, requestEntity, String.class);
+    }
+
+    public void deletePost(Long id) {
+        String url = BASE_URL + "/posts/" + id;
+        restTemplate.delete(url);
+    }
+
+    public ResponseEntity<String> updatePost(Long id, String updatedPostJson) {
+        String url = BASE_URL + "/posts/" + id;
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Content-Type", "application/json");
+        HttpEntity<String> requestEntity = new HttpEntity<>(updatedPostJson, headers);
+        return restTemplate.exchange(url, HttpMethod.PUT, requestEntity, String.class);
+    }
+}
